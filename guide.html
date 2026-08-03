@@ -1,0 +1,427 @@
+<title>Nostalgic TV — Program Guide</title>
+<style>
+  :root {
+    --paper:      #e7e8e3;
+    --paper-2:    #dddfd8;
+    --ink:        #191b17;
+    --ink-soft:   #5f635a;
+    --ink-faint:  #8a8e84;
+    --rule:       #c4c7bd;
+    --rule-soft:  #d3d6cc;
+    --now:        #1d6f36;
+    --now-bg:     #cfe3d3;
+
+    --display: 'Haettenschweiler', 'Arial Narrow', 'Helvetica Neue Condensed', 'Liberation Sans Narrow', Impact, sans-serif;
+    --body: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    --mono: ui-monospace, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --paper:     #131511;
+      --paper-2:   #1c1f19;
+      --ink:       #e4e6dd;
+      --ink-soft:  #9aa093;
+      --ink-faint: #6b7165;
+      --rule:      #33372e;
+      --rule-soft: #26291f;
+      --now:       #6ee08f;
+      --now-bg:    #1b3323;
+    }
+  }
+  :root[data-theme="dark"] {
+    --paper:     #131511;
+    --paper-2:   #1c1f19;
+    --ink:       #e4e6dd;
+    --ink-soft:  #9aa093;
+    --ink-faint: #6b7165;
+    --rule:      #33372e;
+    --rule-soft: #26291f;
+    --now:       #6ee08f;
+    --now-bg:    #1b3323;
+  }
+  :root[data-theme="light"] {
+    --paper:     #e7e8e3;
+    --paper-2:   #dddfd8;
+    --ink:       #191b17;
+    --ink-soft:  #5f635a;
+    --ink-faint: #8a8e84;
+    --rule:      #c4c7bd;
+    --rule-soft: #d3d6cc;
+    --now:       #1d6f36;
+    --now-bg:    #cfe3d3;
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--body);
+    font-size: 15px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 1100px; margin: 0 auto; padding: 0 20px 72px; }
+
+  /* ── Masthead ─────────────────────────────────────────── */
+  .masthead {
+    position: sticky; top: 0; z-index: 20;
+    background: var(--paper);
+    border-bottom: 2px solid var(--ink);
+    padding: 14px 0 10px;
+  }
+  .masthead-inner {
+    max-width: 1100px; margin: 0 auto; padding: 0 20px;
+    display: flex; align-items: flex-end; justify-content: space-between;
+    gap: 20px; flex-wrap: wrap;
+  }
+  .title-block { display: flex; flex-direction: column; gap: 1px; }
+  h1 {
+    font-family: var(--display);
+    font-size: clamp(30px, 6vw, 52px);
+    font-weight: 400;
+    letter-spacing: 0.01em;
+    text-transform: uppercase;
+    margin: 0; line-height: 0.9;
+    text-wrap: balance;
+  }
+  .kicker {
+    font-family: var(--mono);
+    font-size: 10px; letter-spacing: 0.22em; text-transform: uppercase;
+    color: var(--ink-soft);
+  }
+  .daynav { display: flex; align-items: center; gap: 8px; padding-bottom: 3px; }
+  .daynav button {
+    font-family: var(--mono); font-size: 15px; line-height: 1;
+    background: transparent; color: var(--ink);
+    border: 1px solid var(--rule); border-radius: 2px;
+    width: 30px; height: 30px; cursor: pointer;
+  }
+  .daynav button:hover { background: var(--paper-2); }
+  .daynav button:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+  .daynav button[disabled] { opacity: 0.3; cursor: default; }
+  #dayLabel {
+    font-family: var(--mono); font-size: 12px; letter-spacing: 0.1em;
+    text-transform: uppercase; min-width: 190px; text-align: center;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* ── Channel jump rail ────────────────────────────────── */
+  .rail {
+    display: flex; gap: 5px; overflow-x: auto; padding: 9px 0 2px;
+    scrollbar-width: thin;
+  }
+  .rail a {
+    flex: 0 0 auto;
+    font-family: var(--mono); font-size: 11px; font-variant-numeric: tabular-nums;
+    text-decoration: none; color: var(--ink);
+    border: 1px solid var(--rule); border-left-width: 4px;
+    padding: 3px 8px; border-radius: 2px; white-space: nowrap;
+  }
+  .rail a:hover { background: var(--paper-2); }
+  .rail a:focus-visible { outline: 2px solid var(--ink); outline-offset: 1px; }
+
+  .legend {
+    display: flex; gap: 18px; flex-wrap: wrap;
+    font-family: var(--mono); font-size: 10px; letter-spacing: 0.08em;
+    text-transform: uppercase; color: var(--ink-faint);
+    padding: 14px 0 0; margin-top: 16px; border-top: 1px solid var(--rule-soft);
+  }
+  .legend b { color: var(--now); font-weight: 700; }
+
+  /* ── Channel section ──────────────────────────────────── */
+  .channel { margin-top: 40px; scroll-margin-top: 128px; }
+  .ch-head {
+    display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap;
+    border-bottom: 1px solid var(--ink);
+    padding-bottom: 6px;
+  }
+  .ch-num {
+    font-family: var(--display); font-size: 34px; line-height: 0.85;
+    font-variant-numeric: tabular-nums;
+  }
+  .ch-name {
+    font-family: var(--display); font-size: 25px; line-height: 1;
+    text-transform: uppercase; letter-spacing: 0.02em;
+  }
+  .ch-era {
+    font-family: var(--mono); font-size: 10px; letter-spacing: 0.14em;
+    color: var(--ink-faint); margin-left: auto;
+  }
+  .ch-desc {
+    font-size: 13px; color: var(--ink-soft); margin: 7px 0 0;
+    max-width: 62ch;
+  }
+
+  .daypart {
+    font-family: var(--mono); font-size: 10px; letter-spacing: 0.2em;
+    text-transform: uppercase; color: var(--ink-faint);
+    margin: 20px 0 5px; padding-bottom: 3px;
+    border-bottom: 1px dashed var(--rule);
+  }
+
+  ol.listings { list-style: none; margin: 0; padding: 0; }
+  .prog {
+    display: grid;
+    grid-template-columns: 62px 1fr auto;
+    gap: 0 14px; align-items: baseline;
+    padding: 5px 6px 5px 0;
+    border-bottom: 1px solid var(--rule-soft);
+  }
+  .prog:last-child { border-bottom: none; }
+  .prog-time {
+    font-family: var(--mono); font-size: 12px; font-variant-numeric: tabular-nums;
+    color: var(--ink-soft); letter-spacing: 0.02em;
+  }
+  .prog-title { font-weight: 600; text-wrap: pretty; }
+  .prog-show { font-size: 12.5px; color: var(--ink-soft); }
+  .prog-dur {
+    font-family: var(--mono); font-size: 11px; font-variant-numeric: tabular-nums;
+    color: var(--ink-faint); white-space: nowrap;
+  }
+
+  .cont {
+    font-family: var(--mono); font-size: 9.5px; letter-spacing: 0.14em;
+    text-transform: uppercase; color: var(--ink-faint); font-weight: 400;
+    margin-left: 8px; white-space: nowrap;
+  }
+
+  .prog.is-ad { padding-top: 3px; padding-bottom: 3px; }
+  .prog.is-ad .prog-title { font-weight: 400; font-size: 12.5px; color: var(--ink-faint); font-style: italic; }
+  .prog.is-ad .prog-time { color: var(--ink-faint); }
+
+  .prog.is-now { background: var(--now-bg); box-shadow: -6px 0 0 var(--now-bg), 6px 0 0 var(--now-bg); }
+  .prog.is-now .prog-time, .prog.is-now .prog-title { color: var(--now); }
+  .prog.is-now .prog-title::after {
+    content: ' ON NOW';
+    font-family: var(--mono); font-size: 9.5px; letter-spacing: 0.16em;
+    color: var(--now); font-weight: 700;
+  }
+
+  .prog.is-offair { grid-template-columns: 62px 1fr; }
+  .prog.is-offair .prog-title { font-weight: 400; color: var(--ink-faint); font-style: italic; }
+
+  footer {
+    margin-top: 56px; padding-top: 14px; border-top: 2px solid var(--ink);
+    font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.06em;
+    color: var(--ink-faint); text-transform: uppercase;
+  }
+
+  @media (max-width: 620px) {
+    .prog { grid-template-columns: 54px 1fr; }
+    .prog-dur { grid-column: 2; font-size: 10.5px; }
+    .ch-era { margin-left: 0; flex-basis: 100%; }
+    #dayLabel { min-width: 0; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    * { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+  }
+</style>
+
+<header class="masthead">
+  <div class="masthead-inner">
+    <div class="title-block">
+      <span class="kicker">Nostalgic TV · 15 Channels</span>
+      <h1>Program Guide</h1>
+    </div>
+    <div class="daynav">
+      <button id="prevDay" type="button" aria-label="Previous day">&#9664;</button>
+      <span id="dayLabel"></span>
+      <button id="nextDay" type="button" aria-label="Next day">&#9654;</button>
+    </div>
+  </div>
+  <div class="masthead-inner"><nav class="rail" id="rail" aria-label="Jump to channel"></nav></div>
+</header>
+
+<div class="wrap">
+  <div class="legend">
+    <span>Broadcast day runs 6am &rarr; 6am</span>
+    <span><b>Highlighted</b> = on air now</span>
+    <span>Italics = commercial break</span>
+  </div>
+  <main id="guide"></main>
+  <footer id="foot"></footer>
+</div>
+
+<script>
+const CHANNELS = [{"n":1,"name":"PBS Kids","era":"1969–2004","color":"#e67e22","desc":"Sesame Street mornings, Arthur & Magic School Bus after school","blocks":{"morning":[{"t":"Gordon introduces Sally to Sesame Street","s":"Sesame Street","y":1969,"d":59,"ad":false},{"t":"Franklin's Cookies (Part 1)","s":"Franklin","y":1997,"d":11,"ad":false},{"t":"Franklin's Cookies (Part 2)","s":"Franklin","y":1997,"d":11,"ad":false},{"t":"Elmo's World: The Great Outdoors","s":"Elmo's World","y":2004,"d":49,"ad":false},{"t":"Franklin and the Babysitter","s":"Franklin","y":1997,"d":12,"ad":false},{"t":"Franklin's Reading Club","s":"Franklin","y":1997,"d":12,"ad":false},{"t":"Oscar decides to leave Sesame Street","s":"Sesame Street","y":1969,"d":62,"ad":false},{"t":"Franklin and the Babysitter (Part 2)","s":"Franklin","y":1997,"d":12,"ad":false},{"t":"Franklin's Reading Club (Part 2)","s":"Franklin","y":1997,"d":12,"ad":false},{"t":"Big Bird makes a sweater for Susan","s":"Sesame Street","y":1969,"d":60,"ad":false},{"t":"Gold Diggers","s":"Lamb Chop's Play Along","y":1994,"d":29,"ad":false}],"arvo":[{"t":"Arthur's Eyes / Francine's Bad Hair Day","s":"Arthur","y":1996,"d":26,"ad":false},{"t":"Gets Lost in Space","s":"The Magic School Bus","y":1994,"d":26,"ad":false},{"t":"Flight","s":"Bill Nye the Science Guy","y":1993,"d":23,"ad":false},{"t":"Tight Times","s":"Reading Rainbow","y":1983,"d":26,"ad":false},{"t":"Art Attack (Series 7, Episode 4)","s":"Art Attack","y":1995,"d":16,"ad":false},{"t":"Arthur and the Real Mr. Ratburn / Spelling Trouble","s":"Arthur","y":1996,"d":26,"ad":false},{"t":"For Lunch","s":"The Magic School Bus","y":1994,"d":26,"ad":false},{"t":"Dinosaurs","s":"Bill Nye the Science Guy","y":1993,"d":23,"ad":false},{"t":"D.W. All Wet / Buster's Dino Dilemma","s":"Arthur","y":1996,"d":27,"ad":false},{"t":"Miss Nelson is Back","s":"Reading Rainbow","y":1983,"d":29,"ad":false},{"t":"D.W.'s Imaginary Friend / Arthur's Lost Library Book","s":"Arthur","y":1996,"d":26,"ad":false},{"t":"The Emperor's New Clothes","s":"Lamb Chop's Play Along","y":1994,"d":29,"ad":false},{"t":"Inside Ralphie","s":"The Magic School Bus","y":1994,"d":26,"ad":false},{"t":"Skin","s":"Bill Nye the Science Guy","y":1993,"d":23,"ad":false},{"t":"Bea and Mr. Jones","s":"Reading Rainbow","y":1983,"d":28,"ad":false}],"evening":[{"t":"Blows Its Top","s":"The Magic School Bus","y":1995,"d":26,"ad":false},{"t":"The Very Best of The Muppet Show Vol. 1","s":"The Muppet Show","y":1985,"d":62,"ad":false},{"t":"Bugs","s":"Bill Nye the Science Guy","y":1994,"d":23,"ad":false},{"t":"Planets & Moons","s":"Bill Nye the Science Guy","y":1995,"d":23,"ad":false},{"t":"In the Arctic","s":"The Magic School Bus","y":1996,"d":26,"ad":false},{"t":"Art Attack: Christmas Cracker (1995)","s":"Art Attack","y":1995,"d":25,"ad":false},{"t":"Arthur's Pet Business / D.W. the Copycat","s":"Arthur","y":1996,"d":26,"ad":false},{"t":"Gets Eaten","s":"The Magic School Bus","y":1994,"d":26,"ad":false},{"t":"Gravity","s":"Bill Nye the Science Guy","y":1993,"d":23,"ad":false},{"t":"The Bully","s":"Lamb Chop's Play Along","y":1992,"d":29,"ad":false},{"t":"Anchor Desk","s":"Lamb Chop's Play Along","y":1994,"d":29,"ad":false}],"late":null}},{"n":2,"name":"ABC Australia","era":"1990–2002","color":"#1abc9c","desc":"Play School & Johnson and Friends mornings, Blinky Bill after school","blocks":{"morning":[{"t":"Everybody Sing!","s":"Play School","y":1996,"d":59,"ad":false},{"t":"Pink Mug","s":"Bananas in Pyjamas","y":1992,"d":6,"ad":false},{"t":"Grumpy Wumpy","s":"Bananas in Pyjamas","y":1992,"d":5,"ad":false},{"t":"Help! Help!","s":"Bananas in Pyjamas","y":1996,"d":5,"ad":false},{"t":"Banana News","s":"Bananas in Pyjamas","y":1996,"d":5,"ad":false},{"t":"Johnson and Friends: The Birthday Present","s":"Johnson and Friends","y":1994,"d":63,"ad":false},{"t":"Clothing and Body Decoration (Tuesday)","s":"Play School","y":1991,"d":30,"ad":false},{"t":"Lift-Off: EC, Poss and Kim","s":"Lift-Off","y":1994,"d":50,"ad":false},{"t":"Construction Machines (Tuesday)","s":"Play School","y":1992,"d":29,"ad":false}],"arvo":[{"t":"Tuesday Disguise","s":"Bananas in Pyjamas","y":1996,"d":5,"ad":false},{"t":"Blinky Bill and the Lost Puppy","s":"Blinky Bill","y":1996,"d":51,"ad":false},{"t":"The Book Place (BTQ-7, 1997)","s":"The Book Place","y":1997,"d":30,"ad":false},{"t":"Wishing and Hoping","s":"The Genie From Down Under","y":1996,"d":25,"ad":false},{"t":"It's My Opal (and I'll cry if I want to)","s":"The Genie From Down Under","y":1996,"d":25,"ad":false},{"t":"Where's Lulu?","s":"Bananas in Pyjamas","y":1997,"d":5,"ad":false},{"t":"Imaginative Machines (Thursday)","s":"Play School","y":1992,"d":30,"ad":false},{"t":"Nobody's Perfect","s":"The Genie From Down Under","y":1996,"d":25,"ad":false},{"t":"Amy's Trombone","s":"Bananas in Pyjamas","y":1996,"d":5,"ad":false},{"t":"The Triple Agent","s":"The Genie From Down Under","y":1996,"d":25,"ad":false},{"t":"Skeleton on the Dunny","s":"Round the Twist","y":1990,"d":23,"ad":false},{"t":"Birdsdo","s":"Round the Twist","y":1990,"d":24,"ad":false},{"t":"Feral TV: The Mighty Dorky Power Whingers","s":"The Ferals","y":1994,"d":5,"ad":false},{"t":"Series 1, Episodes 1–6","s":"Angela Anaconda","y":2001,"d":65.3,"ad":false}],"evening":[{"t":"Where It's At","s":"The Genie From Down Under","y":1996,"d":25,"ad":false},{"t":"Good Cop, Bad Genie","s":"The Genie From Down Under","y":1996,"d":25,"ad":false},{"t":"The Eternal Quadrangle","s":"The Genie From Down Under","y":1996,"d":26,"ad":false},{"t":"Customs","s":"The Genie From Down Under","y":1996,"d":25,"ad":false},{"t":"Larceny","s":"The Genie From Down Under","y":1996,"d":25,"ad":false},{"t":"A Tale of Two Cities","s":"The Genie From Down Under","y":1996,"d":25,"ad":false},{"t":"School Daze","s":"The Genie From Down Under","y":1996,"d":25,"ad":false},{"t":"Triple Treat","s":"The Genie From Down Under","y":1996,"d":25,"ad":false},{"t":"It's Still Magic","s":"The Genie From Down Under","y":1996,"d":25,"ad":false},{"t":"Santa Claws","s":"Round the Twist","y":1990,"d":24,"ad":false},{"t":"Next Time Around","s":"Round the Twist","y":1993,"d":24,"ad":false},{"t":"The Ferals: Mixy Mania","s":"The Ferals","y":1995,"d":53,"ad":false}],"late":[{"t":"20 Years of rage: Intro (Tex Perkins)","s":"rage","y":2007,"d":3,"ad":false},{"t":"Coolio — Gangsta's Paradise","s":"rage","y":1995,"d":4,"ad":false},{"t":"Oasis — Wonderwall","s":"rage","y":1995,"d":5,"ad":false},{"t":"Guest Programmers: Arguing","s":"rage","y":2007,"d":1,"ad":false},{"t":"R.E.M. — Losing My Religion","s":"rage","y":1991,"d":5,"ad":false},{"t":"The Prodigy — Firestarter","s":"rage","y":1996,"d":4,"ad":false},{"t":"Guest Programmers: Birthday","s":"rage","y":2007,"d":1,"ad":false},{"t":"rage Top 50 (July 1996)","s":"rage","y":1996,"d":19,"ad":false},{"t":"Guest Programmers: Swearing","s":"rage","y":2007,"d":1,"ad":false},{"t":"Jamiroquai — Virtual Insanity","s":"rage","y":1996,"d":4,"ad":false},{"t":"Red Hot Chili Peppers — Love Rollercoaster","s":"rage","y":1996,"d":3,"ad":false},{"t":"Guest Programmers: Crazy","s":"rage","y":2007,"d":1,"ad":false},{"t":"Meat Loaf — I Would Do Anything For Love","s":"rage","y":1993,"d":8,"ad":false},{"t":"rage (ABC, 1987)","s":"rage","y":1987,"d":32,"ad":false},{"t":"Guest Programmers: Night","s":"rage","y":2007,"d":1,"ad":false},{"t":"The Goo Goo Dolls — Iris","s":"rage","y":1998,"d":4,"ad":false},{"t":"Recovery with Silverchair (Part 1)","s":"Recovery","y":1997,"d":90,"ad":false},{"t":"Guest Programmers: Beatboxing","s":"rage","y":2007,"d":1,"ad":false},{"t":"Recovery with Silverchair (Part 2)","s":"Recovery","y":1997,"d":91,"ad":false},{"t":"Guest Programmers: Nutty","s":"rage","y":2007,"d":1,"ad":false},{"t":"Recovery — Full Episode","s":"Recovery","y":1997,"d":180,"ad":false}]}},{"n":3,"name":"Friendly Toons","era":"1960–1998","color":"#27ae60","desc":"Pingu & Spot mornings, Care Bears arvo, Peter Rabbit evenings","blocks":{"morning":[{"t":"Pingu Goes Cross Country Skiing","s":"Pingu","y":1995,"d":5,"ad":false},{"t":"Pingu at the Museum","s":"Pingu","y":1995,"d":5,"ad":false},{"t":"Spot Goes to the Farm","s":"Spot","y":1993,"d":29,"ad":false},{"t":"The Kite","s":"Fireman Sam","y":1987,"d":10,"ad":false},{"t":"Barn Fire","s":"Fireman Sam","y":1987,"d":10,"ad":false},{"t":"Pat's Difficult Day","s":"Postman Pat","y":1981,"d":15,"ad":false},{"t":"Commercial Break","s":"Vintage Ads","y":1987,"d":2,"ad":true},{"t":"Honey for a Bunny / Trap as Trap Can","s":"Winnie the Pooh","y":1989,"d":23,"ad":false},{"t":"Pingu Pretends to be Ill","s":"Pingu","y":1995,"d":5,"ad":false},{"t":"Pingu the Painter","s":"Pingu","y":1995,"d":5,"ad":false},{"t":"Pingu's Grandpa Comes to Stay","s":"Pingu","y":1995,"d":5,"ad":false},{"t":"Pingu's Long Journey","s":"Pingu","y":1995,"d":5,"ad":false},{"t":"Gumby: The Funny Bathtub","s":"Gumby","y":1988,"d":4,"ad":false},{"t":"Pat Takes a Message","s":"Postman Pat","y":1981,"d":15,"ad":false}],"arvo":[{"t":"Camp & Birthday","s":"Care Bears","y":1986,"d":22,"ad":false},{"t":"Best Friends Forever (1)","s":"Babar","y":1989,"d":93,"ad":false},{"t":"Commercial Break","s":"Vintage Ads","y":1987,"d":2,"ad":true},{"t":"Series 1, Episode 1","s":"SuperTed","y":1982,"d":8,"ad":false},{"t":"Series 1, Episode 2","s":"SuperTed","y":1982,"d":8,"ad":false},{"t":"The Trap Door Season 1 Eps 1-5","s":"The Trap Door","y":1984,"d":18,"ad":false},{"t":"Babar's First Step","s":"Babar","y":1989,"d":22,"ad":false},{"t":"Commercial Break","s":"Vintage Ads","y":1987,"d":2,"ad":true},{"t":"Braces / Split Decision","s":"Care Bears","y":1986,"d":22,"ad":false},{"t":"Gumby: Business (Original Pilot)","s":"Gumby","y":1956,"d":6,"ad":false},{"t":"SuperTed: Sheepless Nights","s":"SuperTed","y":1984,"d":22,"ad":false},{"t":"Best Friends Forever (2)","s":"Babar","y":1989,"d":23,"ad":false},{"t":"Lucky Charm / Soap Box Derby","s":"Care Bears","y":1986,"d":22,"ad":false},{"t":"The Trap Door Season 1 Eps 11-15","s":"The Trap Door","y":1984,"d":18,"ad":false},{"t":"SuperTed (Episode 3)","s":"SuperTed","y":1982,"d":8,"ad":false}],"evening":[{"t":"The Tale of Peter Rabbit and Benjamin Bunny","s":"Peter Rabbit","y":1992,"d":26,"ad":false},{"t":"The Snowman","s":"The Snowman","y":1982,"d":26,"ad":false},{"t":"Sweet Dreams, Spot","s":"Spot","y":1995,"d":32,"ad":false},{"t":"The Tale of Tom Kitten and Jemima Puddle-Duck","s":"Peter Rabbit","y":1993,"d":26,"ad":false},{"t":"A Grand Day Out","s":"Wallace & Gromit","y":1989,"d":24,"ad":false},{"t":"Madeline in London","s":"Madeline","y":1992,"d":23,"ad":false},{"t":"Madeline and the Gypsies","s":"Madeline","y":1992,"d":23,"ad":false},{"t":"Madeline and the 40 Thieves","s":"Madeline","y":1993,"d":25,"ad":false},{"t":"The Wrong Trousers","s":"Wallace & Gromit","y":1993,"d":30,"ad":false},{"t":"The Tailor of Gloucester","s":"Peter Rabbit","y":1993,"d":26,"ad":false},{"t":"The Secret of NIMH","s":"Evening Feature","y":1982,"d":81.9,"ad":false}],"late":null}},{"n":4,"name":"Radical TV","era":"1983–1996","color":"#c0392b","desc":"Saturday-morning action — Agro's Cartoon Connection, TMNT, He-Man","blocks":{"satAM":[{"t":"Agro's Cartoon Connection (BTQ-7, 1996)","s":"Agro's Cartoon Connection","y":1996,"d":100,"ad":false},{"t":"Turtle Tracks","s":"TMNT","y":1987,"d":22,"ad":false},{"t":"Commercial Break","s":"Vintage Ads","y":1993,"d":2,"ad":true},{"t":"Day of the Dumpster","s":"Mighty Morphin Power Rangers","y":1993,"d":21,"ad":false},{"t":"Diamond Ray of Disappearance","s":"He-Man","y":1983,"d":21,"ad":false},{"t":"So Long, Old Paint / Trembly Assembly / Private I","s":"Dennis the Menace","y":1986,"d":22,"ad":false},{"t":"TaleSpin (Episode 1)","s":"TaleSpin","y":1990,"d":23,"ad":false},{"t":"TaleSpin (Episode 2)","s":"TaleSpin","y":1990,"d":23,"ad":false},{"t":"TaleSpin (Episode 3)","s":"TaleSpin","y":1990,"d":23,"ad":false},{"t":"Saturday Morning Cartooning: Darkwing Duck","s":"Darkwing Duck","y":1991,"d":30,"ad":false},{"t":"More Than Meets the Eye (1)","s":"Transformers G1","y":1984,"d":23,"ad":false}],"morning":[{"t":"Marsupilami VHS Tape 2","s":"Marsupilami","y":1993,"d":119,"ad":false},{"t":"Diamond Ray of Disappearance","s":"He-Man","y":1983,"d":21,"ad":false},{"t":"Teela's Quest","s":"He-Man","y":1983,"d":22,"ad":false},{"t":"Commercial Break","s":"Vintage Ads","y":1993,"d":2,"ad":true},{"t":"More Than Meets the Eye (1)","s":"Transformers G1","y":1984,"d":23,"ad":false},{"t":"More Than Meets the Eye (2)","s":"Transformers G1","y":1984,"d":23,"ad":false},{"t":"Turtle Tracks","s":"TMNT","y":1987,"d":22,"ad":false},{"t":"Enter the Shredder","s":"TMNT","y":1987,"d":22,"ad":false},{"t":"Visitor from Outer Space / Train That Boy / Genie Madness","s":"Dennis the Menace","y":1986,"d":22,"ad":false},{"t":"Colossor Awakes","s":"He-Man","y":1983,"d":22,"ad":false},{"t":"Cheer Up / Ghostblusters / The Life You Save","s":"Dennis the Menace","y":1986,"d":22,"ad":false},{"t":"Return of the Shredder","s":"TMNT","y":1987,"d":22,"ad":false}],"arvo":[{"t":"A Thing About Rats","s":"TMNT","y":1987,"d":22,"ad":false},{"t":"Hot-Rodding Teenagers","s":"TMNT","y":1987,"d":22,"ad":false},{"t":"Commercial Break","s":"Vintage Ads","y":1993,"d":2,"ad":true},{"t":"Day of the Dumpster","s":"Mighty Morphin Power Rangers","y":1993,"d":21,"ad":false},{"t":"Food Fight","s":"Mighty Morphin Power Rangers","y":1993,"d":21,"ad":false},{"t":"High Five","s":"Mighty Morphin Power Rangers","y":1993,"d":20,"ad":false},{"t":"Commercial Break","s":"Vintage Ads","y":1993,"d":2,"ad":true},{"t":"A Hero for Earth","s":"Captain Planet","y":1990,"d":23,"ad":false},{"t":"Darkly Dawns the Duck (Uncut Pilot)","s":"Darkwing Duck","y":1991,"d":46,"ad":false},{"t":"Marsupilami VHS Tape 1","s":"Marsupilami","y":1993,"d":89,"ad":false},{"t":"Shredder & Splintered","s":"TMNT","y":1987,"d":22,"ad":false},{"t":"Shark Treatment / Jungle Bungle / Racetrack Menace","s":"Dennis the Menace","y":1986,"d":22,"ad":false},{"t":"Teamwork","s":"Mighty Morphin Power Rangers","y":1993,"d":20,"ad":false},{"t":"A Pressing Engagement","s":"Mighty Morphin Power Rangers","y":1993,"d":20,"ad":false},{"t":"Roll For It","s":"Transformers G1","y":1984,"d":23,"ad":false},{"t":"Episode 6","s":"Widget the World Watcher","y":1990,"d":21.7,"ad":false},{"t":"Episode 12","s":"Widget the World Watcher","y":1990,"d":21.6,"ad":false},{"t":"Episode 23","s":"Widget the World Watcher","y":1990,"d":21.5,"ad":false},{"t":"Episode 24","s":"Widget the World Watcher","y":1990,"d":21.6,"ad":false},{"t":"Episode 32","s":"Widget the World Watcher","y":1990,"d":21.4,"ad":false}],"evening":[{"t":"More Than Meets the Eye (3)","s":"Transformers G1","y":1984,"d":23,"ad":false},{"t":"Transport to Oblivion","s":"Transformers G1","y":1984,"d":23,"ad":false},{"t":"Commercial Break","s":"Vintage Ads","y":1993,"d":2,"ad":true},{"t":"The Dragon Invasion","s":"He-Man","y":1983,"d":22,"ad":false},{"t":"The Curse of the Spellstone","s":"He-Man","y":1983,"d":22,"ad":false},{"t":"The Conqueror","s":"Captain Planet","y":1990,"d":23,"ad":false},{"t":"Green With Evil (1)","s":"Mighty Morphin Power Rangers","y":1993,"d":21,"ad":false},{"t":"Green With Evil (2)","s":"Mighty Morphin Power Rangers","y":1993,"d":21,"ad":false},{"t":"All the President's Menace / The Love Rowboat / Wilson the Menace","s":"Dennis the Menace","y":1986,"d":22,"ad":false},{"t":"Divide And Conquer","s":"Transformers G1","y":1984,"d":23,"ad":false},{"t":"The Time Corridor","s":"He-Man","y":1983,"d":22,"ad":false},{"t":"The Incredible Shrinking Turtles","s":"TMNT","y":1987,"d":22,"ad":false}],"late":null}},{"n":5,"name":"Cool Kids","era":"1991–2001","color":"#8e44ad","desc":"90s Nick all day — and the only channel still on after midnight","blocks":{"morning":[{"t":"CatDog Season 4 Ep. 1","s":"CatDog","y":1998,"d":24,"ad":false},{"t":"Pinky and the Brain: Das Mouse","s":"Pinky and the Brain","y":1995,"d":21,"ad":false},{"t":"Commercial Break","s":"90s Ads","y":1995,"d":0.5,"ad":true},{"t":"CatDog Season 4 Ep. 2","s":"CatDog","y":1998,"d":24,"ad":false},{"t":"Pinky and the Brain: Of Mouse and Man","s":"Pinky and the Brain","y":1995,"d":21,"ad":false},{"t":"Arnold's Hat / Stoop Kid","s":"Hey Arnold!","y":1996,"d":23,"ad":false},{"t":"My Left Fang","s":"Where's Wally","y":1991,"d":24,"ad":false},{"t":"It's a Gruel, Gruel World","s":"Where's Wally","y":1991,"d":24,"ad":false},{"t":"Pinky and the Brain: Brainania","s":"Pinky and the Brain","y":1995,"d":21,"ad":false}],"arvo":[{"t":"Hey Arnold Marathon (Jan 2000)","s":"Hey Arnold!","y":2000,"d":123,"ad":false},{"t":"Commercial Break","s":"90s Ads","y":1995,"d":0.5,"ad":true},{"t":"Eating Contest / Rhonda's Glasses","s":"Hey Arnold!","y":1996,"d":23,"ad":false},{"t":"Angelica the Divine (Rugrats VHS)","s":"Rugrats","y":1994,"d":40,"ad":false},{"t":"Forest Women","s":"Where's Wally","y":1991,"d":23,"ad":false},{"t":"CatDog Season 4 Ep. 3","s":"CatDog","y":1998,"d":24,"ad":false},{"t":"Grudge Match / Polishing Rhonda","s":"Hey Arnold!","y":1997,"d":23,"ad":false},{"t":"Fred the Flying Fish / CatDog Divided","s":"CatDog","y":1998,"d":24,"ad":false},{"t":"The Great Ball Game","s":"Where's Wally","y":1991,"d":23,"ad":false},{"t":"Draining the Deep","s":"Where's Wally","y":1991,"d":23,"ad":false},{"t":"Sharkbait","s":"Street Sharks","y":1994,"d":21.8,"ad":false},{"t":"Sharkbite","s":"Street Sharks","y":1994,"d":21.8,"ad":false},{"t":"Sharkstorm","s":"Street Sharks","y":1994,"d":21.8,"ad":false},{"t":"Shark Quest","s":"Street Sharks","y":1994,"d":21.6,"ad":false},{"t":"Lone Shark","s":"Street Sharks","y":1994,"d":21.6,"ad":false},{"t":"Shark n' Roll","s":"Street Sharks","y":1994,"d":21.7,"ad":false},{"t":"Pokémon, I Choose You!","s":"Pokémon","y":1998,"d":22.4,"ad":false},{"t":"Pokémon Emergency","s":"Pokémon","y":1998,"d":22.4,"ad":false},{"t":"Ash Catches a Pokémon","s":"Pokémon","y":1998,"d":22.4,"ad":false},{"t":"Challenge of the Samurai","s":"Pokémon","y":1998,"d":22.4,"ad":false},{"t":"Showdown in Pewter City","s":"Pokémon","y":1998,"d":22.4,"ad":false},{"t":"Clefairy and the Moon Stone","s":"Pokémon","y":1998,"d":22.4,"ad":false}],"evening":[{"t":"Pinky and the Brain: Tokyo Grows","s":"Pinky and the Brain","y":1995,"d":10,"ad":false},{"t":"Pinky and the Brain: That Smarts!","s":"Pinky and the Brain","y":1995,"d":11,"ad":false},{"t":"Commercial Break","s":"90s Ads","y":1995,"d":0.5,"ad":true},{"t":"CatDog Season 4 Ep. 4","s":"CatDog","y":1998,"d":24,"ad":false},{"t":"Pinky and the Brain: Brainstem","s":"Pinky and the Brain","y":1995,"d":2,"ad":false},{"t":"Magic Show / 24 Hours to Live","s":"Hey Arnold!","y":1997,"d":23,"ad":false},{"t":"The Living Exhibits","s":"Where's Wally","y":1991,"d":23,"ad":false},{"t":"CatDog Season 4 Ep. 5","s":"CatDog","y":1998,"d":24,"ad":false},{"t":"Sid's Revenge / Roller Coaster","s":"Hey Arnold!","y":1997,"d":23,"ad":false},{"t":"The Underground Hunters","s":"Where's Wally","y":1991,"d":23,"ad":false},{"t":"Pinky and the Brain: Pinkasso","s":"Pinky and the Brain","y":1996,"d":12,"ad":false},{"t":"Chill Zone (Christmas Episode)","s":"Biker Mice from Mars","y":1994,"d":20.8,"ad":false},{"t":"A Mouse and his Motorcycle","s":"Biker Mice from Mars","y":1994,"d":57.5,"ad":false},{"t":"With Friends Like These...","s":"Rocko's Modern Life","y":1997,"d":63.8,"ad":false}],"late":[{"t":"Pinky's Turn (2001 Nick at Nite, with ads)","s":"Pinky and the Brain","y":2001,"d":20,"ad":false},{"t":"Commercial Break","s":"90s Ads","y":1995,"d":0.5,"ad":true},{"t":"Pinky and the Brain: Pinky & the Fog","s":"Pinky and the Brain","y":1995,"d":9,"ad":false},{"t":"Commercial Break","s":"90s Ads","y":1995,"d":0.5,"ad":true},{"t":"Pinky and the Brain: Plan Brain from Outer Space","s":"Pinky and the Brain","y":1996,"d":21,"ad":false},{"t":"CatDog Season 4 Ep. 6","s":"CatDog","y":1998,"d":24,"ad":false},{"t":"Commercial Break","s":"90s Ads","y":1995,"d":0.5,"ad":true},{"t":"Pinky and the Brain: Brain's Song","s":"Pinky and the Brain","y":1996,"d":21,"ad":false},{"t":"Pinky and the Brain: Where No Mouse Has Gone Before","s":"Pinky and the Brain","y":1995,"d":9,"ad":false},{"t":"Commercial Break","s":"90s Ads","y":1995,"d":0.5,"ad":true},{"t":"Pinky and the Brain: It's Only a Paper World","s":"Pinky and the Brain","y":1996,"d":21,"ad":false},{"t":"Commercial Break","s":"90s Ads","y":1995,"d":0.5,"ad":true},{"t":"Pinky and the Brain: Cheese Roll Call","s":"Pinky and the Brain","y":1995,"d":3,"ad":false}]}},{"n":6,"name":"Player One","era":"1990–1998","color":"#2980b9","desc":"SNES, N64 & PS1 longplays — Zelda every evening, all-night gaming","blocks":{"morning":[{"t":"Donkey Kong Country (SNES)","s":"SNES Longplay","y":1994,"d":121,"ad":false},{"t":"Super Mario World (SNES)","s":"SNES Longplay","y":1990,"d":182,"ad":false}],"arvo":[{"t":"GoldenEye 007 (N64)","s":"N64 Longplay","y":1997,"d":188,"ad":false},{"t":"Crash Bandicoot (PS1)","s":"PS1 Longplay","y":1996,"d":127,"ad":false},{"t":"Donkey Kong Country 2: Diddy's Kong Quest (SNES)","s":"SNES Longplay","y":1995,"d":252,"ad":false}],"evening":[{"t":"The Legend of Zelda: Ocarina of Time — Master Quest (N64)","s":"N64 Longplay","y":1998,"d":635,"ad":false}],"late":[{"t":"Super Mario 64 (N64, 128 stars)","s":"N64 Longplay","y":1996,"d":301,"ad":false},{"t":"Spyro the Dragon (PS1)","s":"PS1 Longplay","y":1998,"d":263,"ad":false},{"t":"Donkey Kong Country 3: Dixie Kong's Double Trouble! (SNES)","s":"SNES Longplay","y":1996,"d":264,"ad":false}]}},{"n":7,"name":"SBS World Movies","era":"1978–2000","color":"#e84393","desc":"Anime & kung-fu by day, then MA world cinema after dark from 10pm","blocks":{"morning":[{"t":"The Castle of Cagliostro","s":"Sunday Anime","y":1979,"d":105,"ad":false},{"t":"Akira","s":"Anime Cinema","y":1988,"d":124,"ad":false},{"t":"Sonic the Hedgehog: The Movie","s":"Sunday Anime","y":1999,"d":54,"ad":false}],"arvo":[{"t":"Drunken Master","s":"Kung-Fu Theatre","y":1978,"d":106,"ad":false},{"t":"Lady Snowblood","s":"Kung-Fu Theatre","y":1973,"d":97,"ad":false},{"t":"Drunken Master II","s":"Kung-Fu Theatre","y":1994,"d":101,"ad":false},{"t":"Lone Wolf and Cub: Sword of Vengeance","s":"Kung-Fu Theatre","y":1972,"d":84,"ad":false}],"evening":[{"t":"Solaris","s":"World Movies","y":1972,"d":167,"ad":false},{"t":"Meshes of the Afternoon","s":"Short Film","y":1943,"d":14,"ad":false},{"t":"Angel's Egg","s":"World Movies","y":1985,"d":71,"ad":false},{"t":"Stalker","s":"World Movies","y":1979,"d":162,"ad":false},{"t":"Barry Lyndon","s":"World Movies","y":1975,"d":185,"ad":false},{"t":"The Killing","s":"World Movies","y":1956,"d":84,"ad":false},{"t":"Police Story","s":"World Movies","y":1985,"d":100,"ad":false},{"t":"Cross of Iron","s":"World Movies","y":1977,"d":132,"ad":false},{"t":"Commercials (SBS)","s":"Ad Break","y":1995,"d":5.4,"ad":true},{"t":"Episode 1","s":"Twin Peaks","y":1990,"d":52.2,"ad":false},{"t":"Episode 2","s":"Twin Peaks","y":1990,"d":49.7,"ad":false},{"t":"Episode 3","s":"Twin Peaks","y":1990,"d":50,"ad":false},{"t":"Episode 4","s":"Twin Peaks","y":1990,"d":52.5,"ad":false},{"t":"Commercials (SBS)","s":"Ad Break","y":1995,"d":6.3,"ad":true},{"t":"Episode 5","s":"Twin Peaks","y":1990,"d":50.4,"ad":false},{"t":"Episode 6","s":"Twin Peaks","y":1990,"d":51.3,"ad":false},{"t":"Episode 7","s":"Twin Peaks","y":1990,"d":51.4,"ad":false},{"t":"Episode 8","s":"Twin Peaks","y":1990,"d":51.7,"ad":false}],"afterdark":[{"t":"Come and See","s":"World Movies","y":1985,"d":143,"ad":false},{"t":"Ninja Scroll","s":"SBS After Dark","y":1993,"d":92,"ad":false},{"t":"The Weather Woman","s":"SBS After Dark","y":1990,"d":85,"ad":false},{"t":"Erotic Ghost Story","s":"SBS After Dark","y":1990,"d":89,"ad":false},{"t":"Maslin Beach","s":"SBS After Dark","y":2000,"d":78,"ad":false},{"t":"A Clockwork Orange","s":"SBS After Dark","y":1971,"d":131,"ad":false},{"t":"Eraserhead","s":"SBS After Dark","y":1977,"d":89.3,"ad":false},{"t":"Hard Boiled","s":"SBS After Dark","y":1992,"d":127.7,"ad":false},{"t":"Stalingrad","s":"SBS After Dark","y":1993,"d":137.8,"ad":false},{"t":"Ali G: Bling Bling","s":"SBS After Dark","y":2001,"d":83.6,"ad":false},{"t":"South Park (SBS Viceland)","s":"SBS After Dark","y":2023,"d":89.8,"ad":false},{"t":"South Park: Bigger, Longer & Uncut","s":"SBS After Dark","y":1999,"d":81.3,"ad":false}]}},{"n":8,"name":"Aussie Saturday","era":"1988–2003","color":"#f39c12","desc":"Homegrown comedy & Saturday variety — Hey Hey, Full Frontal, Russell Coight","blocks":{"satAM":[{"t":"Hey Hey It's Saturday (1988)","s":"Hey Hey It's Saturday","y":1988,"d":63,"ad":false},{"t":"Red Centre, Part 1","s":"Russell Coight's All Aussie Adventures","y":2001,"d":22,"ad":false},{"t":"Skeleton on the Dunny","s":"Round the Twist","y":1990,"d":23,"ad":false},{"t":"Red Centre, Part 2","s":"Russell Coight's All Aussie Adventures","y":2001,"d":22,"ad":false},{"t":"Birdsdo","s":"Round the Twist","y":1990,"d":23,"ad":false},{"t":"Daintree","s":"Russell Coight's All Aussie Adventures","y":2001,"d":22,"ad":false}],"morning":[{"t":"Workout 1, Part 1","s":"Aerobics Oz Style","y":1992,"d":6,"ad":false},{"t":"Commercials","s":"Ad Break","y":1992,"d":2.3,"ad":true},{"t":"Workout 1, Part 2","s":"Aerobics Oz Style","y":1992,"d":5.4,"ad":false},{"t":"Commercials","s":"Ad Break","y":1992,"d":2.2,"ad":true},{"t":"Workout 1, Part 3","s":"Aerobics Oz Style","y":1992,"d":4.4,"ad":false},{"t":"A Good Tip for Ghosts","s":"Round the Twist","y":1990,"d":23,"ad":false},{"t":"Commercials","s":"Ad Break","y":1992,"d":2.2,"ad":true},{"t":"High Country, Part 1","s":"Russell Coight's All Aussie Adventures","y":2001,"d":23,"ad":false},{"t":"The Cabbage Patch Fib","s":"Round the Twist","y":1990,"d":23,"ad":false},{"t":"High Country, Part 2","s":"Russell Coight's All Aussie Adventures","y":2001,"d":23,"ad":false},{"t":"Spaghetti Pig-Out","s":"Round the Twist","y":1990,"d":23,"ad":false}],"arvo":[{"t":"Cooktown","s":"Russell Coight's All Aussie Adventures","y":2001,"d":23,"ad":false},{"t":"The Gum Leaf War","s":"Round the Twist","y":1990,"d":23,"ad":false},{"t":"Muster","s":"Russell Coight's All Aussie Adventures","y":2002,"d":22,"ad":false},{"t":"Santa Claws","s":"Round the Twist","y":1990,"d":24,"ad":false},{"t":"Rogue Croc","s":"Russell Coight's All Aussie Adventures","y":2002,"d":23,"ad":false},{"t":"Commercials","s":"Ad Break","y":1992,"d":2.3,"ad":true},{"t":"Sale of the Century / Burke's Backyard (29 Aug 1992)","s":"Sale of the Century","y":1992,"d":35,"ad":false},{"t":"Commercials (NWS-9, 27 Nov 1991)","s":"Ad Break","y":1991,"d":21.6,"ad":true},{"t":"22 April 1997","s":"Australia's Funniest Home Video Show","y":1997,"d":30,"ad":false},{"t":"Commercials","s":"Ad Break","y":1992,"d":2.2,"ad":true},{"t":"8 June 1990","s":"Burke's Backyard","y":1990,"d":44,"ad":false},{"t":"Volume 1","s":"Man About the House","y":1995,"d":97.1,"ad":false},{"t":"The Amazing Adventures of Mr Bean","s":"Mr Bean","y":1991,"d":60.5,"ad":false}],"evening":[{"t":"4 November 1998, Part 1","s":"Home and Away","y":1998,"d":10.7,"ad":false},{"t":"Commercials","s":"Ad Break","y":1998,"d":2.5,"ad":true},{"t":"4 November 1998, Part 2","s":"Home and Away","y":1998,"d":6.1,"ad":false},{"t":"Commercials","s":"Ad Break","y":1998,"d":2.5,"ad":true},{"t":"4 November 1998, Part 3","s":"Home and Away","y":1998,"d":4.7,"ad":false},{"t":"Commercials","s":"Ad Break","y":1998,"d":2.9,"ad":true},{"t":"4 November 1998, Part 4","s":"Home and Away","y":1998,"d":1.6,"ad":false},{"t":"News Update","s":"Seven News","y":1998,"d":0.9,"ad":false},{"t":"Season 1, Episode 1","s":"Full Frontal","y":1993,"d":44,"ad":false},{"t":"Commercials (NWS-9, 16 Nov 1994)","s":"Ad Break","y":1994,"d":26.8,"ad":true},{"t":"Rare Roo","s":"Russell Coight's All Aussie Adventures","y":2002,"d":23,"ad":false},{"t":"Season 2, Episode 2","s":"Full Frontal","y":1994,"d":44,"ad":false},{"t":"Hey Hey It's Saturday (1992)","s":"Hey Hey It's Saturday","y":1992,"d":120,"ad":false},{"t":"Series 3, Tape 1","s":"Kath & Kim","y":2004,"d":117.4,"ad":false},{"t":"Series 3, Tape 2","s":"Kath & Kim","y":2004,"d":135.5,"ad":false}],"afterdark":[{"t":"2 June 1992","s":"Sex with Sophie Lee","y":1992,"d":56,"ad":false},{"t":"Commercials (NWS-9, 2 Oct 1989)","s":"Ad Break","y":1989,"d":12.6,"ad":true},{"t":"11 June 1992","s":"Sex with Sophie Lee","y":1992,"d":59,"ad":false}],"late":[{"t":"The Adventures of Lano and Woodley (Marathon)","s":"Lano and Woodley","y":1997,"d":368,"ad":false},{"t":"Michael Douglas Ad Breaks","s":"Ad Break","y":1990,"d":1.5,"ad":true}]}},{"n":9,"name":"MTV","era":"1985–1991","color":"#6c5ce7","desc":"Music Television around the clock — real MTV broadcasts from the 80s & 90s","blocks":{"morning":[{"t":"April 28, 1991 (Pt 1)","s":"MTV","y":1991,"d":27,"ad":false},{"t":"June 16, 1985 (Pt 1)","s":"MTV","y":1985,"d":30,"ad":false},{"t":"April 28, 1991 (Pt 2)","s":"MTV","y":1991,"d":27,"ad":false},{"t":"June 16, 1985 (Pt 2)","s":"MTV","y":1985,"d":29,"ad":false},{"t":"April 28, 1991 (Pt 3)","s":"MTV","y":1991,"d":27,"ad":false},{"t":"June 16, 1985 (Pt 3)","s":"MTV","y":1985,"d":11,"ad":false},{"t":"April 28, 1991 (Pt 4)","s":"MTV","y":1991,"d":27,"ad":false},{"t":"June 16, 1985 (Pt 4)","s":"MTV","y":1985,"d":30,"ad":false},{"t":"April 28, 1991 (Pt 5)","s":"MTV","y":1991,"d":21,"ad":false},{"t":"June 16, 1985 (Pt 5)","s":"MTV","y":1985,"d":29,"ad":false},{"t":"April 28, 1991 (Pt 6)","s":"MTV","y":1991,"d":27,"ad":false},{"t":"June 16, 1985 (Pt 6)","s":"MTV","y":1985,"d":12,"ad":false},{"t":"April 28, 1991 (Pt 7)","s":"MTV","y":1991,"d":27,"ad":false},{"t":"April 28, 1991 (Pt 8)","s":"MTV","y":1991,"d":27,"ad":false},{"t":"April 28, 1991 (Pt 9)","s":"MTV","y":1991,"d":27,"ad":false},{"t":"April 28, 1991 (Pt 10)","s":"MTV","y":1991,"d":21,"ad":false}],"arvo":[{"t":"April 28, 1991 (Pt 1)","s":"MTV","y":1991,"d":27,"ad":false},{"t":"June 16, 1985 (Pt 1)","s":"MTV","y":1985,"d":30,"ad":false},{"t":"April 28, 1991 (Pt 2)","s":"MTV","y":1991,"d":27,"ad":false},{"t":"June 16, 1985 (Pt 2)","s":"MTV","y":1985,"d":29,"ad":false},{"t":"April 28, 1991 (Pt 3)","s":"MTV","y":1991,"d":27,"ad":false},{"t":"June 16, 1985 (Pt 3)","s":"MTV","y":1985,"d":11,"ad":false},{"t":"April 28, 1991 (Pt 4)","s":"MTV","y":1991,"d":27,"ad":false},{"t":"June 16, 1985 (Pt 4)","s":"MTV","y":1985,"d":30,"ad":false},{"t":"April 28, 1991 (Pt 5)","s":"MTV","y":1991,"d":21,"ad":false},{"t":"June 16, 1985 (Pt 5)","s":"MTV","y":1985,"d":29,"ad":false},{"t":"April 28, 1991 (Pt 6)","s":"MTV","y":1991,"d":27,"ad":false},{"t":"June 16, 1985 (Pt 6)","s":"MTV","y":1985,"d":12,"ad":false},{"t":"April 28, 1991 (Pt 7)","s":"MTV","y":1991,"d":27,"ad":false},{"t":"April 28, 1991 (Pt 8)","s":"MTV","y":1991,"d":27,"ad":false},{"t":"April 28, 1991 (Pt 9)","s":"MTV","y":1991,"d":27,"ad":false},{"t":"April 28, 1991 (Pt 10)","s":"MTV","y":1991,"d":21,"ad":false}],"evening":[{"t":"April 28, 1991 (Pt 1)","s":"MTV","y":1991,"d":27,"ad":false},{"t":"June 16, 1985 (Pt 1)","s":"MTV","y":1985,"d":30,"ad":false},{"t":"April 28, 1991 (Pt 2)","s":"MTV","y":1991,"d":27,"ad":false},{"t":"June 16, 1985 (Pt 2)","s":"MTV","y":1985,"d":29,"ad":false},{"t":"April 28, 1991 (Pt 3)","s":"MTV","y":1991,"d":27,"ad":false},{"t":"June 16, 1985 (Pt 3)","s":"MTV","y":1985,"d":11,"ad":false},{"t":"April 28, 1991 (Pt 4)","s":"MTV","y":1991,"d":27,"ad":false},{"t":"June 16, 1985 (Pt 4)","s":"MTV","y":1985,"d":30,"ad":false},{"t":"April 28, 1991 (Pt 5)","s":"MTV","y":1991,"d":21,"ad":false},{"t":"June 16, 1985 (Pt 5)","s":"MTV","y":1985,"d":29,"ad":false},{"t":"April 28, 1991 (Pt 6)","s":"MTV","y":1991,"d":27,"ad":false},{"t":"June 16, 1985 (Pt 6)","s":"MTV","y":1985,"d":12,"ad":false},{"t":"April 28, 1991 (Pt 7)","s":"MTV","y":1991,"d":27,"ad":false},{"t":"April 28, 1991 (Pt 8)","s":"MTV","y":1991,"d":27,"ad":false},{"t":"April 28, 1991 (Pt 9)","s":"MTV","y":1991,"d":27,"ad":false},{"t":"April 28, 1991 (Pt 10)","s":"MTV","y":1991,"d":21,"ad":false}],"late":[{"t":"Pink Floyd: The Wall","s":"Late Night Movie","y":1982,"d":95,"ad":false}]}},{"n":10,"name":"The Thinking Box","era":"1958–2005","color":"#e17055","desc":"Smart late-night SBS — Cosmos, At the Movies, Dad's Army, Mon Oncle","blocks":{"morning":[{"t":"The Big Parade","s":"Dad's Army","y":1970,"d":30,"ad":false},{"t":"Don't Forget the Diver","s":"Dad's Army","y":1970,"d":30,"ad":false},{"t":"Boots, Boots, Boots","s":"Dad's Army","y":1970,"d":31,"ad":false},{"t":"Sgt — Save My Boy!","s":"Dad's Army","y":1970,"d":30,"ad":false}],"arvo":[{"t":"The Movie Show (1 Dec 1999)","s":"The Movie Show","y":1999,"d":25,"ad":false},{"t":"Don't Fence Me In","s":"Dad's Army","y":1970,"d":30,"ad":false},{"t":"At the Movies (18 May 2005)","s":"At the Movies","y":2005,"d":27,"ad":false},{"t":"The Movie Show (2001)","s":"The Movie Show","y":2001,"d":26,"ad":false},{"t":"Absent Friends","s":"Dad's Army","y":1970,"d":30,"ad":false}],"evening":[{"t":"Episode 1: The Shores of the Cosmic Ocean","s":"Cosmos","y":1980,"d":60,"ad":false},{"t":"Mon Oncle","s":"Sunday Cinema","y":1958,"d":110,"ad":false},{"t":"Episode 2: One Voice in the Cosmic Fugue","s":"Cosmos","y":1980,"d":60,"ad":false},{"t":"Being There","s":"Sunday Cinema","y":1979,"d":125,"ad":false},{"t":"Episode 2","s":"Louis Theroux's Weird Weekends","y":1998,"d":48.8,"ad":false},{"t":"A Different Brain","s":"Louis Theroux","y":2016,"d":58.7,"ad":false}],"afterdark":[{"t":"Koyaanisqatsi","s":"Late Night Cinema","y":1982,"d":86,"ad":false},{"t":"HyperNormalisation","s":"Adam Curtis","y":2016,"d":167,"ad":false},{"t":"Eat Carpet (3 October 1991)","s":"Eat Carpet","y":1991,"d":46,"ad":false},{"t":"Eat Carpet (25 February 1995)","s":"Eat Carpet","y":1995,"d":37,"ad":false},{"t":"Episode 3: Harmony of the Worlds","s":"Cosmos","y":1980,"d":59,"ad":false},{"t":"Episode 10: The Edge of Forever","s":"Cosmos","y":1980,"d":63,"ad":false},{"t":"Part 1: Baby It's Cold Outside","s":"The Power of Nightmares","y":2004,"d":59.4,"ad":false},{"t":"Part 2: The Phantom Victory","s":"The Power of Nightmares","y":2004,"d":59,"ad":false},{"t":"Part 3: The Shadows in the Cave","s":"The Power of Nightmares","y":2004,"d":59.8,"ad":false},{"t":"Part 1: Happiness Machines","s":"The Century of the Self","y":2002,"d":58.3,"ad":false},{"t":"Part 2: The Engineering of Consent","s":"The Century of the Self","y":2002,"d":58.6,"ad":false},{"t":"Part 3: There is a Policeman Inside All Our Heads","s":"The Century of the Self","y":2002,"d":58.6,"ad":false},{"t":"Part 4: Eight People Sipping Wine","s":"The Century of the Self","y":2002,"d":59,"ad":false},{"t":"Louis and the Nazis","s":"Louis Theroux","y":2003,"d":79.1,"ad":false}]}},{"n":11,"name":"The Late Movie","era":"1978–1995","color":"#9b2226","desc":"Off air until 10pm — then horror and thrillers till dawn","blocks":{"afterdark":[{"t":"Jacob's Ladder","s":"The Late Movie","y":1990,"d":113,"ad":false},{"t":"Dawn of the Dead","s":"The Late Movie","y":1978,"d":155,"ad":false},{"t":"Manhunter","s":"The Late Movie","y":1986,"d":120,"ad":false},{"t":"Angel Heart","s":"The Late Movie","y":1987,"d":118,"ad":false},{"t":"In the Mouth of Madness","s":"The Late Movie","y":1995,"d":95,"ad":false}]}},{"n":12,"name":"Comedy Channel","era":"1975–2006","color":"#a3cb38","desc":"Brit and US comedy all day — Mr Bean, Fawlty Towers, Malcolm, then Letterman after dark","blocks":{"morning":[{"t":"Mr Bean","s":"Mr Bean","y":1990,"d":24,"ad":false},{"t":"Fire","s":"Gogs","y":1993,"d":5,"ad":false},{"t":"The Return of Mr Bean","s":"Mr Bean","y":1990,"d":25,"ad":false},{"t":"Stone Circle","s":"Gogs","y":1993,"d":5,"ad":false},{"t":"The Curse of Mr Bean","s":"Mr Bean","y":1990,"d":25,"ad":false},{"t":"Commercial Break","s":"Ad Break","y":1995,"d":0.5,"ad":true},{"t":"Hunt","s":"Gogs","y":1993,"d":5,"ad":false},{"t":"Mr Bean Goes to Town","s":"Mr Bean","y":1991,"d":24,"ad":false},{"t":"Cave","s":"Gogs","y":1993,"d":5,"ad":false},{"t":"The Trouble with Mr Bean","s":"Mr Bean","y":1992,"d":24,"ad":false},{"t":"Earthquake","s":"Gogs","y":1993,"d":5,"ad":false}],"arvo":[{"t":"The Name","s":"Dilbert","y":1999,"d":22,"ad":false},{"t":"Pilot","s":"Malcolm in the Middle","y":2000,"d":23,"ad":false},{"t":"The Competition","s":"Dilbert","y":1999,"d":22,"ad":false},{"t":"Red Dress","s":"Malcolm in the Middle","y":2000,"d":22,"ad":false},{"t":"The Prototype","s":"Dilbert","y":1999,"d":22,"ad":false},{"t":"Home Alone 4","s":"Malcolm in the Middle","y":2000,"d":22,"ad":false},{"t":"Commercial Break","s":"Ad Break","y":1995,"d":0.5,"ad":true},{"t":"The Takeover","s":"Dilbert","y":1999,"d":22,"ad":false},{"t":"Shame","s":"Malcolm in the Middle","y":2000,"d":23,"ad":false},{"t":"Testing","s":"Dilbert","y":1999,"d":23,"ad":false},{"t":"Malcolm Babysits","s":"Malcolm in the Middle","y":2000,"d":23,"ad":false},{"t":"Elbonian Trip","s":"Dilbert","y":1999,"d":22,"ad":false},{"t":"Sleepover","s":"Malcolm in the Middle","y":2000,"d":23,"ad":false}],"evening":[{"t":"Daddy's Girl","s":"Keeping Up Appearances","y":1990,"d":29,"ad":false},{"t":"A Touch of Class","s":"Fawlty Towers","y":1975,"d":30,"ad":false},{"t":"Stately Home","s":"Keeping Up Appearances","y":1990,"d":29,"ad":false},{"t":"The Builders","s":"Fawlty Towers","y":1975,"d":28,"ad":false},{"t":"The New Vicar","s":"Keeping Up Appearances","y":1990,"d":29,"ad":false},{"t":"The Wedding Party","s":"Fawlty Towers","y":1975,"d":33,"ad":false},{"t":"Commercial Break","s":"Ad Break","y":1995,"d":0.5,"ad":true},{"t":"The Charity Shop","s":"Keeping Up Appearances","y":1990,"d":29,"ad":false},{"t":"The Hotel Inspectors","s":"Fawlty Towers","y":1975,"d":29,"ad":false},{"t":"Daisy's Toyboy","s":"Keeping Up Appearances","y":1990,"d":28,"ad":false},{"t":"Gourmet Night","s":"Fawlty Towers","y":1975,"d":29,"ad":false},{"t":"The Three Sisters","s":"Keeping Up Appearances","y":1990,"d":29,"ad":false},{"t":"The Germans","s":"Fawlty Towers","y":1975,"d":31,"ad":false},{"t":"Treehouse of Horror (Halloween Specials)","s":"The Simpsons","y":1993,"d":88,"ad":false}],"afterdark":[{"t":"20 May 1999","s":"Late Show with David Letterman","y":1999,"d":30.7,"ad":false},{"t":"The Cry of a Hungry Baby","s":"Mr Show","y":1995,"d":28,"ad":false},{"t":"9 May 2001","s":"Late Show with David Letterman","y":2001,"d":23.6,"ad":false},{"t":"Who Let You In","s":"Mr Show","y":1995,"d":29,"ad":false},{"t":"7 February 2002","s":"Late Show with David Letterman","y":2002,"d":29.6,"ad":false},{"t":"Rat Feces","s":"Mr Show","y":1996,"d":29,"ad":false},{"t":"Life Is Precious and God and the Bible","s":"Mr Show","y":1998,"d":24,"ad":false}],"late":[{"t":"Communication Problems","s":"Fawlty Towers","y":1979,"d":31,"ad":false},{"t":"Francis Escapes","s":"Malcolm in the Middle","y":2000,"d":23,"ad":false},{"t":"The Psychiatrist","s":"Fawlty Towers","y":1979,"d":36,"ad":false},{"t":"Krelboyne Picnic","s":"Malcolm in the Middle","y":2000,"d":23,"ad":false},{"t":"Waldorf Salad","s":"Fawlty Towers","y":1979,"d":32,"ad":false},{"t":"Commercial Break","s":"Ad Break","y":1995,"d":0.6,"ad":true},{"t":"Lois vs. Evil","s":"Malcolm in the Middle","y":2000,"d":23,"ad":false},{"t":"The Kipper and the Corpse","s":"Fawlty Towers","y":1979,"d":32,"ad":false},{"t":"Stock Car Races","s":"Malcolm in the Middle","y":2000,"d":23,"ad":false},{"t":"The Anniversary","s":"Fawlty Towers","y":1979,"d":29,"ad":false},{"t":"Basil the Rat","s":"Fawlty Towers","y":1979,"d":34,"ad":false}]}},{"n":13,"name":"Jumbo Video","era":"1968–2004","color":"#00cec9","desc":"The whole rental shop — G and PG by day, M at night, and the back room after 10pm","blocks":{"morning":[{"t":"Toy Story","s":"Jumbo Matinee","y":1995,"d":92,"ad":false},{"t":"A Goofy Movie","s":"Jumbo Matinee","y":1995,"d":90,"ad":false},{"t":"Fantastic Planet","s":"Jumbo Matinee","y":1973,"d":72,"ad":false},{"t":"Rock & Rule","s":"Jumbo Matinee","y":1983,"d":81,"ad":false},{"t":"The Last Unicorn","s":"Jumbo Matinee","y":1982,"d":93,"ad":false},{"t":"Return to Oz","s":"Jumbo Matinee","y":1985,"d":111,"ad":false},{"t":"Watership Down","s":"Jumbo Matinee","y":1978,"d":92,"ad":false},{"t":"Silent Running","s":"Jumbo Matinee","y":1972,"d":90,"ad":false}],"arvo":[{"t":"The Dark Crystal","s":"Afternoon Adventure","y":1982,"d":93,"ad":false},{"t":"Wayne's World","s":"Afternoon Adventure","y":1992,"d":99,"ad":false},{"t":"Starcrash","s":"Afternoon Adventure","y":1978,"d":92,"ad":false},{"t":"Napoleon Dynamite","s":"Afternoon Adventure","y":2004,"d":95,"ad":false},{"t":"The Ice Pirates","s":"Afternoon Adventure","y":1984,"d":94,"ad":false},{"t":"The Gods Must Be Crazy","s":"Afternoon Adventure","y":1980,"d":104,"ad":false},{"t":"Yor, the Hunter from the Future","s":"Afternoon Adventure","y":1983,"d":88,"ad":false},{"t":"Monty Python and the Holy Grail","s":"Afternoon Adventure","y":1975,"d":94,"ad":false},{"t":"Hawk the Slayer","s":"Afternoon Adventure","y":1980,"d":94,"ad":false},{"t":"The Beastmaster","s":"Afternoon Adventure","y":1982,"d":123,"ad":false},{"t":"Battle Beyond the Stars","s":"Afternoon Adventure","y":1980,"d":104,"ad":false}],"evening":[{"t":"The Goonies","s":"New Release Wall","y":1985,"d":97,"ad":false},{"t":"Back to the Future","s":"New Release Wall","y":1985,"d":107,"ad":false},{"t":"The Empire Strikes Back","s":"New Release Wall","y":1980,"d":135,"ad":false},{"t":"Big Trouble in Little China","s":"New Release Wall","y":1986,"d":100,"ad":false},{"t":"Short Circuit","s":"New Release Wall","y":1986,"d":99,"ad":false},{"t":"The Last Starfighter","s":"New Release Wall","y":1984,"d":101,"ad":false},{"t":"Crocodile Dundee","s":"New Release Wall","y":1986,"d":118,"ad":false},{"t":"Kagemusha","s":"New Release Wall","y":1980,"d":180,"ad":false}],"afterdark":[{"t":"RoboCop","s":"The Back Room","y":1987,"d":103,"ad":false},{"t":"Dazed and Confused","s":"The Back Room","y":1993,"d":102,"ad":false},{"t":"Zardoz","s":"The Back Room","y":1974,"d":108,"ad":false},{"t":"Dogma","s":"The Back Room","y":1999,"d":128,"ad":false},{"t":"Heavy Metal","s":"The Back Room","y":1981,"d":90,"ad":false},{"t":"Universal Soldier","s":"The Back Room","y":1992,"d":107,"ad":false},{"t":"Scanners","s":"The Back Room","y":1981,"d":103,"ad":false},{"t":"Barbarella","s":"The Back Room","y":1968,"d":98,"ad":false},{"t":"Vanishing Point","s":"The Back Room","y":1971,"d":106,"ad":false},{"t":"Bad Taste","s":"The Back Room","y":1987,"d":92,"ad":false},{"t":"Darkman","s":"The Back Room","y":1990,"d":95,"ad":false},{"t":"Monty Python's The Meaning of Life","s":"The Back Room","y":1983,"d":107,"ad":false}]}},{"n":14,"name":"Trash TV","era":"1953–2003","color":"#e056fd","desc":"Daytime talk shows and the worst films ever made","blocks":{"morning":[{"t":"6 February 1998","s":"The Jerry Springer Show","y":1998,"d":42,"ad":false},{"t":"Commercial Break","s":"Ad Break","y":1995,"d":0.5,"ad":true},{"t":"20 May 1993","s":"The Oprah Winfrey Show","y":1993,"d":44,"ad":false}],"arvo":[{"t":"23 October 1998","s":"The Jerry Springer Show","y":1998,"d":42,"ad":false},{"t":"Santa Claus Conquers the Martians","s":"Bad Movie Matinee","y":1964,"d":80,"ad":false},{"t":"Plan 9 from Outer Space","s":"Bad Movie Matinee","y":1957,"d":78,"ad":false}],"evening":[{"t":"The Room","s":"The Worst Films Ever Made","y":2003,"d":100,"ad":false},{"t":"Troll 2","s":"The Worst Films Ever Made","y":1990,"d":95,"ad":false}],"afterdark":[{"t":"Showgirls (VH1 Edit)","s":"Trash TV After Dark","y":1995,"d":84,"ad":false},{"t":"18 June 2004","s":"Naked News","y":2004,"d":22,"ad":false},{"t":"15 August 2004","s":"Naked News","y":2004,"d":27,"ad":false},{"t":"Battlefield Earth","s":"The Worst Films Ever Made","y":2000,"d":119,"ad":false},{"t":"Manos: The Hands of Fate","s":"The Worst Films Ever Made","y":1966,"d":69,"ad":false},{"t":"Robot Monster","s":"The Worst Films Ever Made","y":1953,"d":62,"ad":false}]}},{"n":15,"name":"Action Hour","era":"1957–1999","color":"#4834d4","desc":"Adventure serials — TinTin by day, Xena and Hercules all evening","blocks":{"morning":[{"t":"The Blue Lotus","s":"The Adventures of TinTin","y":1991,"d":42,"ad":false},{"t":"Red Rackham's Treasure","s":"The Adventures of TinTin","y":1991,"d":20,"ad":false},{"t":"Commercial Break","s":"Ad Break","y":1995,"d":0.5,"ad":true},{"t":"The Seven Crystal Balls","s":"The Adventures of TinTin","y":1991,"d":40,"ad":false}],"arvo":[{"t":"Prisoners of the Sun","s":"The Adventures of TinTin","y":1991,"d":40,"ad":false},{"t":"The Land of Black Gold","s":"The Adventures of TinTin","y":1991,"d":41,"ad":false},{"t":"Commercial Break","s":"Ad Break","y":1995,"d":0.5,"ad":true},{"t":"Season 4, Episode 1","s":"Xena: Warrior Princess","y":1998,"d":44,"ad":false},{"t":"Season 4, Episode 2","s":"Xena: Warrior Princess","y":1998,"d":43,"ad":false},{"t":"Gladiators Return","s":"Gladiators","y":1993,"d":78.5,"ad":false}],"evening":[{"t":"Hercules in the Underworld","s":"Hercules","y":1995,"d":49,"ad":false},{"t":"Season 4, Episode 3","s":"Xena: Warrior Princess","y":1998,"d":44,"ad":false},{"t":"Commercial Break","s":"Ad Break","y":1995,"d":0.5,"ad":true},{"t":"Season 4, Episode 4","s":"Xena: Warrior Princess","y":1998,"d":42,"ad":false},{"t":"Season 4, Episode 5","s":"Xena: Warrior Princess","y":1998,"d":43,"ad":false},{"t":"Little Miss Dangerous","s":"Miami Vice","y":1986,"d":57.3,"ad":false},{"t":"Trust Fund Pirates","s":"Miami Vice","y":1986,"d":48.2,"ad":false},{"t":"Season 11, Episode 1","s":"Unsolved Mysteries","y":1999,"d":60,"ad":false},{"t":"Season 11, Episode 3","s":"Unsolved Mysteries","y":1999,"d":60.6,"ad":false}],"late":[{"t":"Season 4, Episode 6","s":"Xena: Warrior Princess","y":1998,"d":43,"ad":false},{"t":"Season 4, Episode 7","s":"Xena: Warrior Princess","y":1998,"d":43,"ad":false},{"t":"Season 4, Episode 8","s":"Xena: Warrior Princess","y":1998,"d":43,"ad":false},{"t":"Commercial Break","s":"Ad Break","y":1995,"d":0.5,"ad":true},{"t":"Season 4, Episode 9","s":"Xena: Warrior Princess","y":1998,"d":44,"ad":false},{"t":"Season 4, Episode 10","s":"Xena: Warrior Princess","y":1998,"d":43,"ad":false},{"t":"Death Wish","s":"Late Night Movie","y":1974,"d":93.5,"ad":false}]}}];
+
+/* Same scheduling maths the TV itself runs: playlists are anchored to the
+   Unix epoch, so every listing below is exactly what will be on screen. */
+function daypartForDate(d) {
+  const h = d.getHours();
+  if (h >= 6 && h < 12) return d.getDay() === 6 ? 'satAM' : 'morning';
+  if (h >= 12 && h < 19) return 'arvo';
+  if (h >= 19 && h < 22) return 'evening';
+  if (h >= 22) return 'afterdark';
+  return 'late';
+}
+function playlistForDaypart(ch, dp) {
+  if (dp === 'satAM')    return ch.blocks.satAM    || ch.blocks.morning || null;
+  if (dp === 'afterdark') return ch.blocks.afterdark || ch.blocks.evening || null;
+  // A station already open at 10pm keeps the same lineup past midnight.
+  if (dp === 'late')     return ch.blocks.late     || ch.blocks.afterdark || null;
+  return ch.blocks[dp] || null;
+}
+const DAYPART_LABEL = {
+  satAM: 'Saturday Morning', morning: 'Morning', arvo: 'Afternoon',
+  evening: 'Evening', afterdark: 'After Dark', late: 'Late Night'
+};
+
+// ── Block anchoring: identical to the TV's own scheduler ─────────────────
+const DAYPART_HOURS = [6, 12, 19, 22];
+
+function daypartStart(d) {
+  let b = 0;
+  for (const h of DAYPART_HOURS) if (d.getHours() >= h) b = h;
+  const s = new Date(d); s.setHours(b, 0, 0, 0);
+  return s;
+}
+function nextDaypartBoundary(d) {
+  const y = d.getFullYear(), mo = d.getMonth(), da = d.getDate(), h = d.getHours();
+  for (const b of DAYPART_HOURS) if (b > h) return new Date(y, mo, da, b, 0, 0, 0);
+  return new Date(y, mo, da + 1, 0, 0, 0, 0);
+}
+function blockRange(ch, d) {
+  const playlist = playlistForDaypart(ch, daypartForDate(d));
+  let start = daypartStart(d);
+  for (let i = 0; i < 8; i++) {
+    const before = new Date(start.getTime() - 1000);
+    if (playlistForDaypart(ch, daypartForDate(before)) !== playlist) break;
+    start = daypartStart(before);
+  }
+  let end = nextDaypartBoundary(d);
+  for (let i = 0; i < 8; i++) {
+    if (playlistForDaypart(ch, daypartForDate(end)) !== playlist) break;
+    end = nextDaypartBoundary(end);
+  }
+  return { playlist, start, end };
+}
+function rotatedPlaylist(playlist, blockStartSec) {
+  if (!playlist || playlist.length < 2) return playlist;
+  const day = Math.floor(blockStartSec / 86400);
+  const k = ((day % playlist.length) + playlist.length) % playlist.length;
+  return playlist.slice(k).concat(playlist.slice(0, k));
+}
+
+function dayFor(ch, startDate, endDate) {
+  const nowSec = Math.floor(Date.now() / 1000);
+  const fromSec = Math.floor(startDate.getTime() / 1000);
+  const toSec   = Math.floor(endDate.getTime() / 1000);
+  const segs = [];
+  let cursor = new Date(startDate);
+
+  for (let guard = 0; cursor < endDate && guard < 24; guard++) {
+    const { playlist, start, end } = blockRange(ch, cursor);
+    const startSec = Math.floor(start.getTime() / 1000);
+    const endSec   = Math.floor(end.getTime() / 1000);
+    const dp = daypartForDate(cursor);
+
+    if (!playlist || !playlist.length) {
+      segs.push({ dp, offAir: true, start: Math.max(startSec, fromSec), end: Math.min(endSec, toSec) });
+    } else {
+      const list = rotatedPlaylist(playlist, startSec);
+      const rows = [];
+      let t = startSec;
+      for (let n = 0; t < endSec && n < 400; n++) {
+        const ep = list[n % list.length];
+        const s = t, e = s + ep.d * 60;
+        if (e > fromSec && s < Math.min(endSec, toSec)) {
+          rows.push({ ep, start: s, end: Math.min(e, endSec),
+                      now: s <= nowSec && e > nowSec && nowSec >= startSec && nowSec < endSec });
+        }
+        t = e;
+      }
+      segs.push({ dp, segStart: Math.max(startSec, fromSec), rows });
+    }
+    cursor = end;
+  }
+  return segs;
+}
+
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;' }[c]));
+const hhmm = sec => new Date(sec * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
+const mins = m => (m >= 60 ? Math.floor(m / 60) + 'h ' + String(Math.round(m % 60)).padStart(2, '0') + 'm' : Math.round(m) + 'm');
+
+let dayOffset = 0;
+
+function nextOnAir(ch, fromDate) {
+  const probe = new Date(fromDate);
+  for (let i = 0; i < 12; i++) {
+    const pl = playlistForDaypart(ch, daypartForDate(probe));
+    if (pl && pl.length) return probe;
+    const nh = [6, 12, 19, 22].find(b => b > probe.getHours());
+    if (nh === undefined) probe.setHours(24, 0, 0, 0); else probe.setHours(nh, 0, 0, 0);
+  }
+  return null;
+}
+
+function render() {
+  // The broadcast day runs 6am to 6am, so before 6am you are still inside
+  // yesterday's day — anchor to that, or the small hours list as "tomorrow".
+  const start = new Date();
+  if (start.getHours() < 6) start.setDate(start.getDate() - 1);
+  start.setHours(6, 0, 0, 0);
+  start.setDate(start.getDate() + dayOffset);
+  const end = new Date(start); end.setDate(end.getDate() + 1);
+
+  document.getElementById('dayLabel').textContent =
+    start.toLocaleDateString([], { weekday: 'long', day: 'numeric', month: 'short' });
+  document.getElementById('prevDay').disabled = dayOffset <= -1;
+  document.getElementById('nextDay').disabled = dayOffset >= 6;
+
+  document.getElementById('rail').innerHTML = CHANNELS.map(c =>
+    `<a href="#ch${c.n}" style="border-left-color:${c.color}">${c.n} ${esc(c.name)}</a>`).join('');
+
+  document.getElementById('guide').innerHTML = CHANNELS.map(ch => {
+    const segs = dayFor(ch, start, end);
+    let lastLabel = null;
+    const body = segs.map(seg => {
+      let out = '';
+      const label = DAYPART_LABEL[seg.dp];
+      if (label !== lastLabel) { out += `<div class="daypart">${label}</div>`; lastLabel = label; }
+      if (seg.offAir) {
+        const back = nextOnAir(ch, new Date(seg.end * 1000));
+        const when = back ? back.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }) : null;
+        return out + `<ol class="listings"><li class="prog is-offair">
+          <span class="prog-time">${hhmm(seg.start)}</span>
+          <span class="prog-title">Off air${when ? ' &mdash; back at ' + when : ''}</span></li></ol>`;
+      }
+      return out + '<ol class="listings">' + seg.rows.map(r => {
+        // A programme straddling a daypart boundary is joined in progress —
+        // list it at the time it actually appears, with the time left to run.
+        const joined = r.start < seg.segStart;
+        const shownAt = joined ? seg.segStart : r.start;
+        const left = (r.end - shownAt) / 60;
+        return `
+        <li class="prog${r.ep.ad ? ' is-ad' : ''}${r.now ? ' is-now' : ''}">
+          <span class="prog-time">${hhmm(shownAt)}</span>
+          <span class="prog-title">${esc(r.ep.t)}${joined ? '<span class="cont">joined in progress</span>' : ''}</span>
+          <span class="prog-dur">${mins(left)}</span>
+          ${r.ep.ad ? '' : `<span></span><span class="prog-show">${esc(r.ep.s)}${r.ep.y ? ' &middot; ' + r.ep.y : ''}</span>`}
+        </li>`;
+      }).join('') + '</ol>';
+    }).join('');
+
+    return `<section class="channel" id="ch${ch.n}">
+      <div class="ch-head" style="border-bottom-color:${ch.color}">
+        <span class="ch-num" style="color:${ch.color}">${ch.n}</span>
+        <span class="ch-name">${esc(ch.name)}</span>
+        <span class="ch-era">${esc(ch.era)}</span>
+      </div>
+      <p class="ch-desc">${esc(ch.desc)}</p>
+      ${body}
+    </section>`;
+  }).join('');
+
+  const totalProgs = CHANNELS.reduce((s, c) =>
+    s + Object.values(c.blocks).reduce((t, b) => t + (b ? b.length : 0), 0), 0);
+  document.getElementById('foot').textContent =
+    `${CHANNELS.length} channels · ${totalProgs} programmes in rotation · times are your local clock · generated ${new Date().toLocaleString()}`;
+}
+
+document.getElementById('prevDay').addEventListener('click', () => { dayOffset--; render(); scrollTo({ top: 0 }); });
+document.getElementById('nextDay').addEventListener('click', () => { dayOffset++; render(); scrollTo({ top: 0 }); });
+render();
+setInterval(render, 60000);
+</script>
