@@ -1,0 +1,50 @@
+name: Content & Link Check
+
+on:
+  schedule:
+    # 20:00 UTC Sunday = ~6am Monday AEST / 7am AEDT
+    - cron: '0 20 * * 0'
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+  issues: write
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - run: pip install requests
+
+      - name: Check archive.org links
+        run: python .github/scripts/check_links.py
+
+      - name: Scan for new content candidates
+        run: python .github/scripts/scan_new_content.py
+
+      - name: Ensure label exists
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh label create content-check \
+            --description "Automated link/content check reports" \
+            --color FBCA04 || true
+
+      - name: Open or update report issue
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: python .github/scripts/build_report.py
+
+      - name: Commit updated seen-content tracking
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add .github/scripts/seen-content.json
+          git diff --cached --quiet || git commit -m "Update seen-content tracking [skip ci]"
+          git push
